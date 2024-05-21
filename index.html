@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password List App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style type="text/tailwindcss">
+        @layer utilities {
+
+            .menubutton {
+                @apply w-full px-3 py-2 text-left text-slate-300;
+            }
+
+            .form-control{
+                @apply p-1 border border-slate-300 ;
+            }
+
+            .password {
+                @apply flex gap-x-3 items-center p-1 my-[1px];
+            }
+
+            .password > button {
+                @apply border border-slate-500 px-2 py-1 rounded flex;
+            }
+
+            .btn {
+                @apply px-2 py-1 rounded;
+            }
+
+            [x-cloak] { display: none !important; }
+
+
+            .loader {
+                z-index: 100;
+                border: 16px solid #f3f3f3;
+                border-top: 16px solid #3498db;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                animation: spin 1s linear infinite;
+            }
+
+            .loader {
+                @apply absolute top-1 left-[10rem];
+            }
+
+
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+
+        }
+    </style>
+
+</head>
+
+<body class="">
+
+    <div class="md:w-[36rem] mx-auto bg-slate-100 relative border border-slate-300 my-5" x-data="App()" x-init="init()">
+
+
+        <!-- menu bar -->
+        <div class="bg-slate-700 px-3 py-2 text-white flex justify-between" @click="menuOpen = !menuOpen">
+            <div>Password List App</div>
+            <button type="button" >&#9776;</button>
+        </div>
+
+        <!-- menu items -->
+        <div class="bg-slate-600 grid divide-y" x-show="menuOpen">
+            <button type="button" class="menubutton" @click="showPasswords()">Manage Password List</button>
+            <button type="button" class="menubutton" @click="logout()">Logout</button>
+        </div>
+        
+
+
+        <!-- password list here -->
+        <div class="text-slate-700 p-3" x-show="pwdListOpen">
+
+            <div class="text-2xl my-3">Password List</div>
+
+            <div class="flex gap-x-3 items-center my-3 bg-slate-300 p-1">
+
+                <div>Filter:</div>
+
+                <input type="text" name="filter" id="filter" class="form-control flex-1"
+                    placeholder="filter as you type..." x-model="passwordFilter">
+
+            </div>
+
+
+            <div>
+
+                <div class="password my-3">
+
+                    <input type="text" class="flex-1 form-control" placeholder="add new password here..."
+                        x-model="passwordToAdd">
+
+                    <button type="button" class="text-sky-700" @click="addPassword()">
+                        <i class="material-icons">add</i>
+                    </button>
+
+                </div>
+
+                <div class="my-3">
+
+                    <template x-for="pwd in PasswordListFiltered()">
+
+                        <div class="password">
+
+                            <input type="text" class="flex-1 form-control" x-model="pwd.value">
+
+                            <button type="button" class="text-red-700" @click="deletePassword(pwd)">
+                                <i class="material-icons">delete</i>
+                            </button>
+
+                            <button type="button" class="text-green-700" @click="updatePassword(pwd)">
+                                <i class="material-icons">save</i>
+                            </button>
+
+                        </div>
+
+                    </template>
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <!-- login form here -->
+        <div class="bg-white grid text-slate-700 p-3" x-show="loginOpen">
+
+            <div>
+                <div class="text-2xl  font-semibold my-3">Login</div>
+
+            </div>
+
+            <div> &nbsp;</div>
+
+            <div class="grid grid-cols-5 gap-x-3 items-center my-3 p-1">
+                <div> &nbsp;</div>
+                <div class=" col-span-4"><i class="text-sm underline cursor-pointer text-blue-500"
+                        @click="username='demo@tester.com'; password = 'Demotester!1'">Test with username:
+                        <b>demo@tester.com</b> , password: <b>Demotester!1</b></i></div>
+            </div>
+
+            <div class="grid grid-cols-5 gap-x-3 items-center my-3 p-1">
+                <div>Username:</div>
+                <input type="text" class="form-control col-span-4" placeholder="Your username here..."
+                    x-model="username">
+            </div>
+
+            <div class="grid grid-cols-5 gap-x-3 items-center my-3 p-1">
+                <div>Password:</div>
+                <input type="password" class="form-control col-span-4" x-model="password">
+            </div>
+
+            <div class="grid grid-cols-5 gap-x-3 items-start my-3 p-1">
+                <div>Expire:</div>
+                <div class="col-span-4">
+                    <input type="number" class="form-control w-full" min="1" x-model="expireInDays">
+                    <i class="text-sm ml-1">(the token expires in as many days)</i>
+                </div>
+
+            </div>
+
+            <div class="grid grid-cols-5 gap-x-3 items-center my-3  p-1">
+                <div>&nbsp;</div>
+                <button class="btn col-span-2 bg-slate-300" @click="login()">login</button>
+            </div>
+
+
+            <div class="my-3  p-1 text-center">
+                Don't have an account? See how you can register at <a href="https://littledataapi.com"
+                    class="text-blue-500 underline" target="_blank">https://littledataapi.com</a>
+            </div>
+
+        </div>
+
+
+
+
+
+
+        <div id="loader" class="loader" x-show="loaderVisible" x-cloak></div>
+
+        <div class="bg-yellow-200 text-red-500 px-3 py-1" x-show="errors" x-text="errors">An error occurred.</div>
+
+        <div class="px-3 flex items-center justify-between italic text-sm text-slate-500 py-1 border-t border-slate-300"
+            :class="loggedInUser != ''? '' : 'hidden'">
+            <div class="flex items-center justify-start gap-x-3">
+                <div>User: </div>
+                <div x-text="loggedInUser"></div>
+            </div>
+            <div class="flex items-center justify-start gap-x-3">
+                <div> login expiry: </div>
+                <div x-text="loginExpiresOn"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Alpine Plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- Alpine Core -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <script src="/js/littledataapi.js"></script>
+    <script src="/js/index.js"></script>
+
+</body>
+
+</html>
