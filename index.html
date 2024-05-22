@@ -74,7 +74,7 @@
         <!-- menu bar -->
         <div class="bg-slate-700 px-3 py-2 text-white flex justify-between" @click="menuOpen = !menuOpen">
             <div>Password List App</div>
-            <button type="button" >&#9776;</button>
+            <button type="button">&#9776;</button>
         </div>
 
         <!-- menu items -->
@@ -82,7 +82,7 @@
             <button type="button" class="menubutton" @click="showPasswords()">Manage Password List</button>
             <button type="button" class="menubutton" @click="logout()">Logout</button>
         </div>
-        
+
 
 
         <!-- password list here -->
@@ -102,12 +102,9 @@
 
             <div>
 
+
                 <div class="password my-3">
-
-                    <input type="text" class="flex-1 form-control" placeholder="add new password here..."
-                        x-model="passwordToAdd">
-
-                    <button type="button" class="text-sky-700" @click="addPassword()">
+                    <button type="button" class="text-sky-700" @click="showAddPassword()">
                         <i class="material-icons">add</i>
                     </button>
 
@@ -117,9 +114,27 @@
 
                     <template x-for="pwd in PasswordListFiltered()">
 
-                        <div class="password">
-
-                            <input type="text" class="flex-1 form-control" x-model="pwd.value">
+                        <div class="flex">
+                            <div class="my-3 flex-1">  
+                                <div class="grid grid-cols-4 gap-y-3">
+                                    <label>Username:</label>
+                                    <input type="text" class="col-span-3 form-control" x-model="pwd.value[0]">
+                                </div>
+                                <div class="grid grid-cols-4 gap-y-3">
+                                    <label>Password:</label>
+                                    <input type="text" class="col-span-3 form-control" x-model="pwd.value[1]">
+                                </div>
+                                <div class="grid grid-cols-4 gap-y-3">
+                                    <label>Url:</label>
+                                    <input type="text" class="col-span-3 form-control" x-model="pwd.value[2]">
+                                </div>
+                                <div class="grid grid-cols-4 gap-y-3">
+                                    <label>Description:</label>
+                                    <input type="text" class="col-span-3 form-control" x-model="pwd.value[3]">
+                                </div>
+                            </div>
+                            
+                        
 
                             <button type="button" class="text-red-700" @click="deletePassword(pwd)">
                                 <i class="material-icons">delete</i>
@@ -190,7 +205,45 @@
 
         </div>
 
+        <!-- add password form here -->
+        <div class="bg-white grid text-slate-700 p-3 gap-y-3" x-show="addPwdOpen">
 
+            <div>
+                <div class="text-2xl  font-semibold my-3">Add new Password</div>
+
+            </div>
+
+            <div> &nbsp;</div>
+
+            <div class="grid grid-cols-4">
+                <label for="una">Username:</label>
+                <input type="text" class="form-control col-span-3" id="una" x-model="usernameToAdd">
+            </div>
+
+            <div class="grid grid-cols-4">
+                <label for="pwa">Password:</label>
+                <input type="password" class="form-control col-span-3" id="pwa" x-model="passwordToAdd">
+            </div>
+
+            <div class="grid grid-cols-4">
+                <label for="ura">Url:</label>
+                <input type="text" class="form-control col-span-3" id="ura" x-model="urlToAdd">
+            </div>
+
+            <div class="grid grid-cols-4">
+                <label for="dsa">Description:</label>
+                <input type="text" class="form-control col-span-3" id="dsa" x-model="descriptionToAdd">
+            </div>
+
+            <div class="grid grid-cols-4">
+                <label for=""> </label>
+                <button type="button" class="btn col-span-2 bg-slate-300 col-span-3" @click="addPassword(showPasswords())">add password</button>
+            </div>
+
+
+
+
+        </div>
 
 
 

@@ -4,20 +4,27 @@ window.App = () => {
         'menuOpen': false,
         'pwdListOpen': true,
         'loginOpen': false,
+        'addPwdOpen': false,
         'loaderVisible': false,
 
         'PasswordList': [
-            { "id": 1, "value": "Password 1" },
-            { "id": 2, "value": "Password 2" },
-            { "id": 3, "value": "Password 3" },
+            { id: 5, value: "[\"username\",\"password\",\"url\",\"description\"]" }
         ],
-        'passwordFilter':'',
-        PasswordListFiltered(){
-            
-            return this.passwordFilter ? this.PasswordList.filter(a => a.value.toLowerCase().indexOf(this.passwordFilter.toLowerCase())> -1 ) : this.PasswordList
+        'passwordFilter': '',
+        PasswordListFiltered() {
+
+            const r = this.passwordFilter ? 
+                                this.PasswordList.filter(a => 
+                                        a.value.join().toLowerCase().indexOf(this.passwordFilter.toLowerCase()) > -1
+                                    ) : 
+                                this.PasswordList
+            return r
         },
-        
-        passwordToAdd: '',
+
+        'usernameToAdd': '',
+        'passwordToAdd': '',
+        'urlToAdd': '',
+        'descriptionToAdd': '',
 
         'username': '',
         'password': '', // 
@@ -25,6 +32,17 @@ window.App = () => {
         'errors': '',
         'loggedInUser': '',
         'loginExpiresOn': '',
+
+        objToPassword(x) {
+            //const x = {id: 5, value: "[\"username\",\"password\",\"url\",\"description\"]"}
+            let y = Function("return " + x.value)()            
+            return {id: x.id, value: y}
+        },
+
+        pwdToStringToAdd() {
+            const retStr = JSON.stringify([this.usernameToAdd,this.passwordToAdd,this.urlToAdd,this.descriptionToAdd])
+            return retStr
+        },
 
         showLogin(hide) {
             this.pwdListOpen = false
@@ -37,7 +55,12 @@ window.App = () => {
             this.loginOpen = false
             this.menuOpen = false
         },
-        
+        showAddPassword(hide) {            
+            this.addPwdOpen = hide ? false : true
+            this.loginOpen = false
+            this.menuOpen = false
+        },
+
         init() {
             this.getPasswords(() => this.getUserInfo())
         }, // init()
@@ -64,7 +87,7 @@ window.App = () => {
                     localStorage.setItem("_lda_token", json.message)
                     this.loginOpen = false
                     this.getUserInfo()
-                    this.getPasswords(() => this.getPasswordList())
+                    this.getPasswords(this.showPasswords())
 
                 }, // OK
                 (json) => {
@@ -74,18 +97,21 @@ window.App = () => {
             )
 
         }, // /login()
-        logout(){
+        logout() {
             localStorage.removeItem("_lda_token");
             document.location = document.location.toString()
         },
         sortByValue(a, b) {
-            if ( a.value < b.value ){
+            if (a.value < b.value) {
                 return -1;
-              }
-              if ( a.value > b.value ){
+            }
+            if (a.value > b.value) {
                 return 1;
-              }
-              return 0;
+            }
+            return 0;
+        },
+        populate(json){
+            this.PasswordList = json.data.map(x => this.objToPassword(x))//.sort(this.sortByValue)
         },
         getPasswords(callback) {
             this.loaderVisible = true
@@ -96,7 +122,7 @@ window.App = () => {
             else {
                 this.LDA.getStrings('PasswordList', token,
                     (json) => {
-                        this.PasswordList = json.data//.sort(this.sortByValue)
+                        this.populate(json)
                         if (callback) {
                             callback()
                         }
@@ -121,9 +147,9 @@ window.App = () => {
             }
 
             else {
-                this.LDA.postStrings('PasswordList', token, [this.passwordToAdd],
+                this.LDA.postStrings('PasswordList', token, [this.pwdToStringToAdd()],
                     (json) => {
-                        this.PasswordList = json.data
+                        this.populate(json)
                         this.passwordToAdd = ''
                         if (callback) {
                             callback()
@@ -146,9 +172,9 @@ window.App = () => {
                 this.showLogin()
             }
             else {
-                this.LDA.putStrings(pwd.id, token, pwd.value,
+                this.LDA.putStrings(pwd.id, token, JSON.stringify(pwd.value),
                     (json) => {
-                        this.PasswordList = json.data
+                        this.populate(json)
                         if (callback) {
                             callback()
                         }
@@ -174,7 +200,7 @@ window.App = () => {
             else {
                 this.LDA.deleteStringById(pwd.id, token,
                     (json) => {
-                        this.PasswordList = json.data
+                        this.populate(json)
                         if (callback) {
                             callback()
                         }
