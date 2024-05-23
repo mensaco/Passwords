@@ -86,36 +86,45 @@
 
 
         <!-- password list here -->
+        <div class="text-2xl p-3">Password List</div>
+        
+        <div class="p-3">
+            <button type="button" class="text-sky-700" @click="showAddPassword()">
+                <i class="material-icons">add</i>
+            </button>
+        </div>
+
         <div class="text-slate-700 p-3" x-show="pwdListOpen">
 
-            <div class="text-2xl my-3">Password List</div>
+            
 
-            <div class="flex gap-x-3 items-center my-3 bg-slate-300 p-1">
+            <div class="flex gap-x-3 items-center  bg-slate-300 p-1">
 
-                <div>Filter:</div>
+                <div class="p-1">Filter:</div>
 
                 <input type="text" name="filter" id="filter" class="form-control flex-1"
                     placeholder="filter as you type..." x-model="passwordFilter">
-
+                <button type="button" class="cursor-pointer hover:bg-slate-400 p-1 rounded "
+                    @click="passwordFilter = ''">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#5f6368" class="h-6 w-6">
+                        <path
+                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                    </svg>
+                </button>
             </div>
 
 
             <div>
 
 
-                <div class="password my-3">
-                    <button type="button" class="text-sky-700" @click="showAddPassword()">
-                        <i class="material-icons">add</i>
-                    </button>
-
-                </div>
+                
 
                 <div class="my-3">
 
                     <template x-for="pwd in PasswordListFiltered()">
 
-                        <div class="flex">
-                            <div class="my-3 flex-1">  
+                        <div class="flex items-center gap-x-3" >
+                            <div class="my-3 flex-1">
                                 <div class="grid grid-cols-4 gap-y-3">
                                     <label>Username:</label>
                                     <input type="text" class="col-span-3 form-control" x-model="pwd.value[0]">
@@ -133,16 +142,20 @@
                                     <input type="text" class="col-span-3 form-control" x-model="pwd.value[3]">
                                 </div>
                             </div>
+
                             
-                        
+                            <div class="flex flex-col gap-3 w-6">
+                                <button type="button" class="text-green-700" @click="updatePassword(pwd)">
+                                    <i class="material-icons">save</i>
+                                </button>
+                                <button type="button" class="text-red-700" @click="deletePassword(pwd)">
+                                    <i class="material-icons">delete</i>
+                                </button>
+                                <div class="flex-1">&nbsp;</div>
+                            </div>
 
-                            <button type="button" class="text-red-700" @click="deletePassword(pwd)">
-                                <i class="material-icons">delete</i>
-                            </button>
 
-                            <button type="button" class="text-green-700" @click="updatePassword(pwd)">
-                                <i class="material-icons">save</i>
-                            </button>
+
 
                         </div>
 
@@ -237,7 +250,13 @@
 
             <div class="grid grid-cols-4">
                 <label for=""> </label>
-                <button type="button" class="btn col-span-2 bg-slate-300 col-span-3" @click="addPassword(showPasswords())">add password</button>
+                <div class="grid grid-cols-2 col-span-3 gap-3">
+                <button type="button" class="btn bg-slate-300 "
+                    @click="addPassword(showPasswords())">add password</button>
+                <button type="button" class="btn bg-slate-300"
+                    @click="showPasswords()">cancel</button>
+                
+                </div>
             </div>
 
 

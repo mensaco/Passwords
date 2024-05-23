@@ -57,6 +57,7 @@ window.App = () => {
         },
         showAddPassword(hide) {            
             this.addPwdOpen = hide ? false : true
+            this.pwdListOpen = false
             this.loginOpen = false
             this.menuOpen = false
         },
